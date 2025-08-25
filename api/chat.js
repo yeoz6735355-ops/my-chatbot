@@ -21,30 +21,25 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "gpt-4o-mini",   // ✅ 최신 모델
         messages: [
-          { role: "system", content: "You are Ultimate Diet Coach, a helpful Korean/English diet assistant." },
+          { role: "system", content: "You are Ultimate Diet Coach, a helpful assistant that answers in Korean or English depending on user input." },
           { role: "user", content: message }
         ],
         temperature: 0.7
       }),
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error("OpenAI API Error:", error);
-      return res.status(response.status).json({ error });
-    }
-
     const data = await response.json();
-    console.log("✅ OpenAI API Response:", data);  // 👉 로그 확인용
+    console.log("🔍 OpenAI API raw response:", data);
 
-    // ✅ 안전하게 응답 체크
+    // ✅ 응답 구조 확인 후 안전하게 처리
     const reply =
       data?.choices?.[0]?.message?.content ||
+      data?.choices?.[0]?.text ||   // 혹시 text 형식으로 올 때 대비
       "⚠️ Error: No reply from GPT";
 
     res.status(200).json({ reply });
   } catch (error) {
-    console.error("Server Error:", error);
+    console.error("❌ Server Error:", error);
     res.status(500).json({ error: error.message });
   }
 }
