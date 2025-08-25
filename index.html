@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Ultimate Diet Coach</title>
@@ -12,11 +12,14 @@
   </style>
 </head>
 <body>
-  <h1>Ultimate Diet Coach🤖</h1>
+  <h1>Ultimate Diet Coach 🤖</h1>
+  <p>Welcome! This is your personal GPT-powered diet coaching chatbot.</p>
+  <p>You can chat in <strong>English or Korean</strong>, and the bot will respond accordingly.</p>
+  
   <div id="chat"></div>
 
-  <input type="text" id="input" placeholder="메시지를 입력하세요" style="width:80%;">
-  <button onclick="sendMessage()">전송</button>
+  <input type="text" id="input" placeholder="Type in English or Korean..." style="width:80%;">
+  <button onclick="sendMessage()">Send</button>
 
   <script>
     const chat = document.getElementById('chat');
@@ -24,7 +27,7 @@
     function addMessage(text, sender) {
       const div = document.createElement('div');
       div.className = 'msg ' + sender;
-      div.textContent = (sender === 'user' ? '🙋‍♀️ 나: ' : '🤖 봇: ') + text;
+      div.textContent = (sender === 'user' ? '🙋‍♀️ You: ' : '🤖 Ultimate Diet Coach: ') + text;
       chat.appendChild(div);
       chat.scrollTop = chat.scrollHeight;
     }
@@ -36,13 +39,12 @@
       addMessage(text, 'user');
       input.value = '';
 
-      // 여기가 GPT API랑 연결되는 자리예요
-      // 지금은 임시 답변만 보여주도록 해놨어요
+      // 👉 Later this part will connect to GPT API
+      // For now, placeholder response is bilingual
       setTimeout(() => {
-        addMessage("여기는 GPT의 답변이 들어올 자리입니다.", 'bot');
+        addMessage("This is where GPT’s answer will appear. (여기에 GPT의 답변이 표시됩니다.)", 'bot');
       }, 500);
     }
   </script>
 </body>
 </html>
-
