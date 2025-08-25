@@ -32,7 +32,7 @@
       chat.scrollTop = chat.scrollHeight;
     }
 
-    function sendMessage() {
+    async function sendMessage() {
       const input = document.getElementById('input');
       const text = input.value.trim();
       if (!text) return;
@@ -41,10 +41,18 @@
 
       // 👉 Later this part will connect to GPT API
       // For now, placeholder response is bilingual
-      setTimeout(() => {
-        addMessage("This is where GPT’s answer will appear. (여기에 GPT의 답변이 표시됩니다.)", 'bot');
-      }, 500);
+        // 👉 Vercel API Route 호출
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
+  });
+
+  const data = await response.json();
+  addMessage(data.reply, 'bot');
+
     }
   </script>
 </body>
 </html>
+
