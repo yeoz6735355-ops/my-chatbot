@@ -2,24 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ultimate Diet Coach</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; }
-    #chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
+    body { font-family: Arial, sans-serif; background: #fafafa; text-align: center; margin: 0; padding: 0; }
+    h1 { background: #4CAF50; color: white; padding: 15px; margin: 0; }
+    #chat { width: 90%; max-width: 600px; height: 400px; margin: 20px auto; padding: 10px; border: 1px solid #ccc; background: white; overflow-y: scroll; text-align: left; }
     .msg { margin: 5px 0; }
     .user { color: blue; }
     .bot { color: green; }
+    #input-area { display: flex; justify-content: center; margin: 20px; }
+    #input { width: 70%; padding: 10px; }
+    button { padding: 10px; margin-left: 5px; }
   </style>
 </head>
 <body>
   <h1>Ultimate Diet Coach 🤖</h1>
-  <p>Welcome! This is your personal GPT-powered diet coaching chatbot.</p>
-  <p>You can chat in <strong>English or Korean</strong>, and the bot will respond accordingly.</p>
-  
+  <p>Welcome! This is your personal GPT-powered diet coaching chatbot.<br>
+     You can chat in <b>English</b> or <b>Korean</b>, and the bot will respond accordingly.</p>
+
   <div id="chat"></div>
 
-  <input type="text" id="input" placeholder="Type in English or Korean..." style="width:80%;">
-  <button onclick="sendMessage()">Send</button>
+  <div id="input-area">
+    <input id="input" type="text" placeholder="Type in English or Korean..." onkeydown="if(event.key==='Enter'){sendMessage()}">
+    <button onclick="sendMessage()">Send</button>
+  </div>
 
   <script>
     const chat = document.getElementById('chat');
@@ -27,7 +34,7 @@
     function addMessage(text, sender) {
       const div = document.createElement('div');
       div.className = 'msg ' + sender;
-      div.textContent = (sender === 'user' ? '🙋‍♀️ You: ' : '🤖 Ultimate Diet Coach: ') + text;
+      div.textContent = (sender === 'user' ? '🙋 You: ' : '🤖 Ultimate Diet Coach: ') + text;
       chat.appendChild(div);
       chat.scrollTop = chat.scrollHeight;
     }
@@ -39,20 +46,24 @@
       addMessage(text, 'user');
       input.value = '';
 
-      // 👉 Later this part will connect to GPT API
-      // For now, placeholder response is bilingual
+      try {
         // 👉 Vercel API Route 호출
-  const response = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
-  });
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
 
-  const data = await response.json();
-  addMessage(data.reply, 'bot');
-
+        const data = await response.json();
+        if (data.reply) {
+          addMessage(data.reply, 'bot');
+        } else {
+          addMessage("⚠️ Error: No reply from GPT", 'bot');
+        }
+      } catch (err) {
+        addMessage("❌ Error connecting to GPT API", 'bot');
+      }
     }
   </script>
 </body>
 </html>
-
