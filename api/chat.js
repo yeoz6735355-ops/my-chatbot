@@ -16,12 +16,12 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`, // ✅ Vercel 환경변수
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",   // ✅ 최신 경량 모델 (빠르고 저렴)
+        model: "gpt-4o-mini",   // ✅ 최신 모델
         messages: [
-          { role: "system", content: "You are Ultimate Diet Coach, a friendly Korean/English diet assistant." },
+          { role: "system", content: "You are Ultimate Diet Coach, a helpful Korean/English diet assistant." },
           { role: "user", content: message }
         ],
         temperature: 0.7
@@ -35,9 +35,14 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
+    console.log("✅ OpenAI API Response:", data);  // 👉 로그 확인용
 
-    // ✅ GPT 응답 전달
-    res.status(200).json({ reply: data.choices[0].message.content });
+    // ✅ 안전하게 응답 체크
+    const reply =
+      data?.choices?.[0]?.message?.content ||
+      "⚠️ Error: No reply from GPT";
+
+    res.status(200).json({ reply });
   } catch (error) {
     console.error("Server Error:", error);
     res.status(500).json({ error: error.message });
