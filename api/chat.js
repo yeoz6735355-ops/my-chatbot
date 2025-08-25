@@ -15,26 +15,26 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`, // Vercel 환경변수
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",  // 최신 안정 모델
+        model: "gpt-4o-mini",  // 최신 소형 모델 (빠르고 저렴)
         messages: [
-          { role: "system", content: "You are Ultimate Diet Coach. If user writes Korean, answer in Korean. If English, answer in English." },
+          { role: "system", content: "You are Ultimate Diet Coach. Reply in Korean if the user writes Korean, otherwise reply in English." },
           { role: "user", content: message },
         ],
-        max_tokens: 300,
-        temperature: 0.7,
+        max_tokens: 200,
       }),
     });
 
     const data = await response.json();
-    console.log("🔍 API raw response:", JSON.stringify(data, null, 2));
+    console.log("🔍 OpenAI raw response:", JSON.stringify(data, null, 2));
 
+    // ✅ 응답 파싱 보강 (text, message.content 둘 다 체크)
     const reply =
       data.choices?.[0]?.message?.content?.trim() ||
       data.choices?.[0]?.text?.trim() ||
-      "⚠️ GPT gave no response.";
+      "⚠ GPT gave no response.";
 
     res.status(200).json({ reply });
   } catch (error) {
