@@ -19,23 +19,32 @@ export default async function handler(req, res) {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",   // ✅ 최신 모델
+        model: "gpt-4o-mini", // 안정적인 최신 모델
         messages: [
-          { role: "system", content: "You are Ultimate Diet Coach, a helpful assistant that answers in Korean or English depending on user input." },
-          { role: "user", content: message }
+          {
+            role: "system",
+            content:
+              "You are Ultimate Diet Coach, a helpful assistant. Always reply in Korean if the user writes Korean, otherwise reply in English.",
+          },
+          { role: "user", content: message },
         ],
-        temperature: 0.7
+        max_tokens: 300,
+        temperature: 0.7,
       }),
     });
 
     const data = await response.json();
-    console.log("🔍 OpenAI API raw response:", data);
+    console.log("🔍 API response:", data);
 
-    // ✅ 응답 구조 확인 후 안전하게 처리
+    if (!data || !data.choices || data.choices.length === 0) {
+      return res.status(500).json({ reply: "⚠️ GPT gave no response." });
+    }
+
+    // ✅ 응답 구조에서 안전하게 답 추출
     const reply =
-      data?.choices?.[0]?.message?.content ||
-      data?.choices?.[0]?.text ||   // 혹시 text 형식으로 올 때 대비
-      "⚠️ Error: No reply from GPT";
+      data.choices[0].message?.content ||
+      data.choices[0].text ||
+      "⚠️ GPT returned empty content.";
 
     res.status(200).json({ reply });
   } catch (error) {
